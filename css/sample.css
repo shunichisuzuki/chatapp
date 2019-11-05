@@ -1,0 +1,162 @@
+/* body{
+    margin:0;
+    padding:0;
+    text-align:left;
+    font-size: 16px;
+} */
+header{
+    background-color: #fff;
+    border-bottom: 1px solid #ccc;
+    text-align: center;
+}
+main{
+    border-bottom:1px solid #ccc;
+}
+footer{
+    background-color: #fff;
+    border-bottom:1px solid #ccc;
+    text-align: center;
+}
+p{
+    font-size:100%;
+    text-align: left;
+    border-bottom:1px solid #fff;
+}
+ul{
+    padding: 0;
+    border-top: 1px solid #000000;
+    display:table;  /* 定義 */
+    table-layout: fixed;
+    width:100%;
+}
+li{
+    text-align: center;
+    list-style-type:none;
+    border: 1px solid #666;
+    background-color: #FFF;
+    display:table-cell;  /* 定義 */
+    cursor: pointer;
+}
+li:hover{
+    background: #0066CC;
+    color:#fff;
+}
+
+.setting{
+    overflow: auto;
+    background: skyblue;
+}
+
+.box{
+  display: flex;
+}
+
+.btn{
+    background-color: blue;
+    text-align: center;
+    color: white;
+}
+
+.btn2{
+    background-color: goldenrod;
+    text-align: center;
+    color: white;
+}
+
+.btn3{
+    background-color: greenyellow;
+    text-align: center;
+    color: white;
+}
+
+body {
+    overflow-x: hidden;
+    font-family: "Helvetica Neue", Helvetica, "Hiragino Kaku Gothic Pro", "Lucida Grande", Verdana, Arial, Meiryo, "メイリオ", sans-serif;
+}
+
+.panel {
+    margin: 0;
+    background-image: url("../images/background_sky.jpg");
+}
+
+.panel-body {
+    overflow: auto;
+}
+
+.chatBox {
+    width: 100%;
+    height: auto;
+    overflow: hidden;
+}
+
+.chatBalloon {
+    display: inline-block;
+    border-radius: 10px;
+    padding: 5px;
+    margin: 5px;
+    background-color: white;
+}
+
+.usr {
+    float: right;
+    background-color: Lime;
+}
+
+.inputText {
+    text-align: right;
+}
+
+.mybaloon {
+    width: 60%;
+    margin-right: auto;
+    background-color: white;
+}
+
+.otherbaloon {
+    width: 60%;
+    margin-left: auto;
+    background-color: lime;
+}
+
+.test1 {
+    color: red;
+}
+
+.test2 {
+    color: blue;
+}
+
+.box1 {
+    padding: 0.5em 1em;
+    /* margin: 2em 0; */
+    font-weight: bold;
+    color: #c71585;/*文字色*/
+    background: #FFF;
+    border: solid 3px #c71585;/*線*/
+    border-radius: 10px;/*角の丸み*/
+}
+
+.box2 {
+    padding: 0.5em 1em;
+    /* margin: 2em 0; */
+    font-weight: bold;
+    color: #6091d3;/*文字色*/
+    background: #FFF;
+    border: solid 3px #6091d3;/*線*/
+    border-radius: 10px;/*角の丸み*/
+}
+
+.parent{
+  display: flex;
+  flex-direction: column;
+}
+
+.tate{
+  display: flex;
+  flex-direction: column;
+}
+
+.container{
+  display:flex;
+  flex-direction:column;
+}

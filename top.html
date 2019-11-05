@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="css/sample.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.3.0/mustache.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"
+        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+    <title>Chatアプリ ユーザ トップ画面</title>
+</head>
+
+<body>
+
+    <script type="text/javascript" src="js/jquery-3.4.1.js"></script>
+    <script type="text/javascript" src="js/bootstrap.bundle.js"></script>
+
+    <div id="currenttalk"></div>
+    <div>　</div>
+    <div id="output"></div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/5.7.2/firebase.js"></script>
+    <script>
+        // Initialize Firebase
+        var config = {
+            ■利用防止のため削除いたしました。
+        };
+        firebase.initializeApp(config);
+
+        // // メッセージ送信の準備
+        var newPostRef = firebase.database().ref();
+
+        function ymd() {
+            var date = new Date();
+            var yy = date.getFullYear();
+            var mm_tmp = 0;
+            var mm_tmp = date.getMonth() + 1;
+            var mm = ("0" + mm_tmp).slice(-2);
+            var dd = ("0" + date.getDate()).slice(-2);
+            var hh = ("0" + date.getHours()).slice(-2);
+            var mi = ("0" + date.getMinutes()).slice(-2);
+            var ss = ("0" + date.getSeconds()).slice(-2);
+            return yy + "/" + mm + "/" + dd + " " + hh + ":" + mi + ":" + ss;
+        }
+
+        var user_name = 'test1';
+
+        var promise = new Promise(function (resolve, reject) {
+            var userinfo = new Array();
+            var userChkRef = firebase.database().ref().child('users');
+            userChkRef.on('value', function (snapshot) {
+                snapshot.forEach(function (children) {
+                    if (children.val().name == user_name) {
+                        userinfo[0] = children.val().name;
+                        userinfo[1] = children.val().room;
+                        resolve(userinfo);
+                    }
+                });
+            });
+        });
+        promise.then(function (data) {
+
+            var current_user = data[0];
+            var rooms = data[1];
+
+            var str = '';
+            str += '<p>ユーザ ' + current_user + ' </p>';
+
+            if (rooms == 0) {
+                var str = '';
+                str += '<p>現在会話中のトークはありません。</p>';
+                $('#currenttalk').append(str);
+            }
+
+            if (String(rooms).indexOf('0') == -1) {
+                var promise2 = new Promise(function (resolve, reject) {
+                    var result = String(rooms).split('.');
+                    str += '<p>現在会話中のトークがあります。</p>';
+
+                    var roomChkRef = firebase.database().ref().child('room');
+                    roomChkRef.on('value', function (snapshot) {
+                        snapshot.forEach(function (children) {
+                            var key = children.key;
+                            var roomn = children.val().room_number;
+                            var mnum = children.val().message_num;
+                            // console.log('key: ' + key + ' -- room: ' + roomn + ' -- message: ' + mnum);
+                            str += '<input type="button" class="btn2" value="トーク' + roomn + '" onclick="viewtalk(\'' + key + '\',\'' + mnum + '\')">';
+                            str += '</div>';
+                            children.forEach(function (mago) {
+                            });
+                        });
+                        resolve(str);
+                    });
+                });
+                promise2.then(function (str) {
+                    $('#currenttalk').append(str);
+                });
+            }
+        });
+
+        var viewtalk = function (key, mnum) {
+            $('#selectedtalk').empty();
+
+            if (mnum == 0) {
+                var str = '';
+                str += '<p class="test1">現在メッセージはありません。</p>';
+                $('#selectedtalk').append(str);
+            } else {
+                //talk内容取得。
+                var str = '';
+                str += '<div class="tate">';
+                var talkChkRef = firebase.database().ref().child('room/' + key + '/talk/');
+                talkChkRef.on('value', function (one) {
+                    one.forEach(function (two) {
+                        // 各talk の内容の階層
+                        str += '<div class="container">';
+
+                        if (two.val().name == user_name) {
+
+                            str += '<div class="box1 mybaloon"> ';
+                            str += '入力時刻 : ' + two.val().time;
+                            str += '<p>' + two.val().text + '</p>';
+                            if (two.val().url != 'なし') {
+                                str += '<img src="' + two.val().url + '">';
+                            }
+                            str += '</div>';
+                        }
+                        if (two.val().name != user_name) {
+                            str += '<div class="box2 otherbaloon"> ';
+                            str += 'ユーザ : ' + two.val().name + '　入力時刻: ' + two.val().time;
+                            str += '<p>' + two.val().text + '</p>';
+                            if (two.val().url != 'なし') {
+                                str += '<img src="' + two.val().url + '">';
+                            }
+                            str += '</div>';
+                        }
+                    });
+                    str += '</div>';
+                });
+                $('#selectedtalk').append(str);
+            }
+
+            $('#inputarea').empty();
+            var str2 = '';
+            str2 += '<div class="parent">';
+            str2 += '<div id="output"></div>';
+            str2 += '<div><input type="text" id="name" placeholder="名前"></div>';
+            str2 += '<div class="box">';
+            str2 += '<textarea class="setting" name="" id="text" cols="80" rows="5" placeholder="メッセージを入力"></textarea>';
+            str2 += '<input type="button" class="btn2" value="送信" onclick="inputs(\'' + key + '\')">';
+            str2 += '</div>';
+            str2 += '<div><input type="file" id="btnUpload" value="アップロード"></div>';
+            str2 += '</div>';
+            $('#inputarea').append(str2);
+
+            btnUpload = document.getElementById("btnUpload");
+
+            btnUpload.addEventListener("change", e => {
+                var file = e.target.files;
+                var file_name = file[0].name;
+                var blob = new Blob(file, { type: "image/png" });
+                var storage = firebase.storage();
+                var uploadRef = storage.ref('images/').child(file_name);
+                uploadRef.put(blob).then(snapshot => {
+                    uploadRef.getDownloadURL().then(url => {
+                        var promise5 = new Promise(function (resolve, reject) {
+                            var mes_num = 0;
+                            var MesRef = firebase.database().ref().child('room/' + key);
+                            MesRef.on('value', function (mes) {
+                                mes_num = mes.val().message_num;
+                                resolve(mes_num);
+                            });
+                        });
+                        promise5.then(function (mes_num) {
+                            var inputnum = 0;
+
+                            if (inputnum == 0) {
+                                inputnum = 1;
+
+                                var tname = $('#name').val();
+                                var ttime = ymd();
+                                var ttext = $('#text').val();
+                                var turl = url;
+
+                                var newPostRef = firebase.database().ref().child('room/' + key + '/talk');
+                                newPostRef.push({
+                                    name: tname,
+                                    time: ttime,
+                                    text: ttext,
+                                    url: turl
+                                });
+
+                                $('#text').val('');
+
+                                mes_num += 1;
+                                var newPostRef2 = firebase.database().ref().child('room/' + key);
+                                newPostRef2.update({
+                                    message_num: mes_num,
+                                });
+
+                                var str3 = '';
+                                if (tname == user_name) {
+
+                                    str3 += '<div class="box1 mybaloon"> ';
+                                    str3 += '入力時刻 : ' + ttime;
+                                    str3 += '<p>' + ttext + '</p>';
+                                    if (turl != 'なし') {
+                                        str3 += '<img src="' + turl + '">';
+                                    }
+                                    str3 += '</div>';
+                                    $('#selectedtalk').append(str3);
+                                }
+                                if (tname != user_name) {
+                                    str3 += '<div class="box2 otherbaloon"> ';
+                                    str3 += 'ユーザ : ' + tname + '　入力時刻: ' + ttime;
+                                    str3 += '<p>' + ttext + '</p>';
+                                    if (turl != 'なし') {
+                                        str3 += '<img src="' + turl + '">';
+                                    }
+                                    str3 += '</div>';
+                                    $('#selectedtalk').append(str3);
+                                }
+                            }
+                        });
+                    }).catch(error => {
+                        console.log(error);
+                    });
+                });
+            });
+        };
+
+        var inputs = function (key) {
+            // ■メッセージ数を取ってきてメッセージをプッシュし、メッセージ数を上書きする。
+            var promise3 = new Promise(function (resolve, reject) {
+
+                var mes_num = 0;
+                var MesRef = firebase.database().ref().child('room/' + key);
+                MesRef.on('value', function (mes) {
+                    mes_num = mes.val().message_num;
+                    resolve(mes_num);
+                });
+            });
+            promise3.then(function (mes_num) {
+                var inputnum = 0;
+
+                if (inputnum == 0) {
+                    inputnum = 1;
+
+                    var tname = $('#name').val();
+                    var ttime = ymd();
+                    var ttext = $('#text').val();
+                    var turl = $('#btnUpload').val();
+
+                    var newPostRef = firebase.database().ref().child('room/' + key + '/talk');
+                    newPostRef.push({
+                        name: tname,
+                        time: ttime,
+                        text: ttext,
+                        url: turl
+                    });
+
+                    $('#text').val('');
+
+                    mes_num += 1;
+                    var newPostRef2 = firebase.database().ref().child('room/' + key);
+                    newPostRef2.update({
+                        message_num: mes_num,
+                    });
+
+                    var str3 = '';
+                    if (tname == user_name) {
+
+                        str3 += '<div class="box1 mybaloon"> ';
+                        str3 += '入力時刻 : ' + ttime;
+                        str3 += '<p>' + ttext + '</p>';
+                        if (turl != 'なし') {
+                            str3 += '<img src="' + turl + '">';
+                        }
+                        str3 += '</div>';
+                        $('#selectedtalk').append(str3);
+                    }
+                    if (tname != user_name) {
+                        str3 += '<div class="box2 otherbaloon"> ';
+                        str3 += 'ユーザ : ' + tname + '　入力時刻: ' + ttime;
+                        str3 += '<p>' + ttext + '</p>';
+                        if (turl != 'なし') {
+                            str3 += '<img src="' + turl + '">';
+                        }
+                        str3 += '</div>';
+                        $('#selectedtalk').append(str3);
+                    }
+                }
+            });
+        }
+    </script>
+
+    <div class="tate">
+        <div id="inputarea"></div>
+        <div id="selectedtalk"></div>
+    </div>
+
+</body>
+
+</html>
